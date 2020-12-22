@@ -1,0 +1,10 @@
+[package]
+name = "neorisc_lib"
+version = "0.1.0"
+authors = ["Barnabás Rátki <barna.ratki@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+thiserror = "1.0.22"
+regex = "1"
+lazy_static = "1.4.0"
