@@ -12,24 +12,7 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75be6772-c03a-46c6-b9ea-59851879321f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../neorisc_gui/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../neorisc_gui/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../neorisc_gui/.idea/neorisc_gui.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../neorisc_gui/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../neorisc_gui/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../neorisc_gui/Cargo.lock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../neorisc_gui/Cargo.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../neorisc_gui/src/main.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/neorisc_lib.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
-    </list>
+    <list default="true" id="75be6772-c03a-46c6-b9ea-59851879321f" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -126,7 +109,7 @@
       <option name="presentableId" value="Default" />
       <updated>1608657142434</updated>
       <workItem from="1608657144216" duration="873000" />
-      <workItem from="1608658190196" duration="10878000" />
+      <workItem from="1608658190196" duration="10924000" />
     </task>
     <servers />
   </component>
