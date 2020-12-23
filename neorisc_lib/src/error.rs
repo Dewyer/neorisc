@@ -12,6 +12,26 @@ pub enum LangParseError {
     PossibleForgottenColon,
     #[error("InvalidMnemonic")]
     InvalidMnemonic,
+    #[error("InvalidRegisterArgument")]
+    InvalidRegisterArgument,
+    #[error("RegisterIndexOutOfBounds")]
+    RegisterIndexOutOfBounds,
+    #[error("InvalidConstantArgument")]
+    InvalidConstantArgument,
+    #[error("ConstantOutOfBounds")]
+    ConstantOutOfBounds,
+    #[error("InvalidAddressArgument")]
+    InvalidAddressArgument,
+    #[error("AddressOutOfBounds")]
+    AddressOutOfBounds,
+    #[error("InvalidCharArgument")]
+    InvalidCharArgument,
+    #[error("CharOutOfBounds")]
+    CharOutOfBounds,
+    #[error("ExpectedComma")]
+    ExpectedComma,
+    #[error("UnexpectedToken")]
+    UnexpectedToken,
     #[error("Other exception occured")]
     Other,
 }

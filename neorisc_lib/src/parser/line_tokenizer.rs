@@ -6,23 +6,33 @@ struct LangTokenizerContext {
     pub in_string: bool,
     pub tokens: Vec<String>,
     pub last_backslash: bool,
+    pub next_char_to_add: Option<char>,
 }
 
-fn is_char_whitespace(chr: char) -> bool {
-    match chr {
-        ' ' => true,
-        '\t' => true,
-        '\n' => true,
-        '\r' => true,
-        _ => false,
+fn flush_buffer(mut ctx: LangTokenizerContext) -> LangTokenizerContext {
+    if ctx.buffer.len() > 0 {
+        ctx.tokens.push(ctx.buffer);
+    }
+    ctx.buffer = String::new();
+
+    ctx
+}
+
+fn get_escaped_character(next_char: char) -> char {
+    match next_char {
+        '\\' => '\\',
+        't' => '\t',
+        'n' => '\n',
+        'r' => '\r',
+        _ => next_char,
     }
 }
 
-fn set_in_char_string(&mut ctx: LangTokenizerContext, new_char: char) {
+fn get_next_escaped_char(ctx: &LangTokenizerContext, next_char: char) -> char {
     if !ctx.last_backslash {
-        if new_char == '\'' {
-            ctx.in_char = ctx.in;
-        }
+        next_char
+    } else {
+        get_escaped_character(next_char)
     }
 }
 
@@ -33,18 +43,85 @@ pub fn tokenize_source_line(line: &str) -> Result<Vec<String>, LangParseError> {
         in_string: false,
         tokens: vec![],
         last_backslash: false,
+        next_char_to_add: None,
     };
 
     for char in line.chars() {
-        if !ctx.in_string && !ctx.in_char {
-        } else {
-            if ctx.last_backslash {}
-        }
-
-        if !ctx.last_backslash && char == '\\' {
-            ctx.last_backslash = true;
+        match char {
+            '\\' => {
+                if ctx.last_backslash {
+                    ctx.buffer.push('\\');
+                } else {
+                    ctx.last_backslash = true;
+                }
+            }
+            ' ' | '\r' | '\n' | '\t' => {
+                if ctx.in_char || ctx.in_string {
+                    ctx.buffer.push(char);
+                } else {
+                    ctx = flush_buffer(ctx);
+                }
+            }
+            '\"' | '\'' => {
+                if !ctx.last_backslash {
+                    if char == '\"' {
+                        ctx.in_string = !ctx.in_string;
+                    } else {
+                        ctx.in_char = !ctx.in_char;
+                    }
+                }
+                ctx.buffer.push(char);
+            }
+            ',' | ':' => {
+                ctx = flush_buffer(ctx);
+                ctx.buffer.push(char);
+                ctx = flush_buffer(ctx);
+            }
+            ';' => {
+                if ctx.last_backslash || ctx.in_string || ctx.in_char {
+                    ctx.buffer.push(char);
+                } else {
+                    break;
+                }
+            }
+            _ => {
+                ctx.buffer.push(get_next_escaped_char(&ctx, char));
+            }
         }
     }
+    ctx = flush_buffer(ctx);
 
     Ok(ctx.tokens)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::parser::line_tokenizer::tokenize_source_line;
+
+    #[test]
+    fn it_works() {
+        let tokens = tokenize_source_line("hello  : world").expect("Tokenizer failed");
+
+        println!("tokens: {:?}", tokens);
+        assert_eq!(tokens.len(), 3);
+    }
+
+    #[test]
+    fn char_parse() {
+        let tokens = tokenize_source_line("hello ' '").expect("Tokenizer failed");
+
+        println!("tokens: {:?}", tokens);
+        println!("second: {}", tokens[1]);
+        assert_eq!(tokens.len(), 2);
+    }
+
+    #[test]
+    fn str_parse() {
+        let tokens =
+            tokenize_source_line("MOV r0, \"Hello World!\\n\\r\"").expect("Tokenizer failed");
+
+        println!("tokens: {:?}", tokens);
+        println!("last: {}", tokens[3]);
+        assert_eq!(tokens.len(), 4);
+    }
 }
