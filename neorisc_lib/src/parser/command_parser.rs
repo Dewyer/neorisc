@@ -1,11 +1,6 @@
 use crate::error::LangParseError;
 use crate::lang::{LangCommand, LangLiteral};
 use crate::parser::line_tokenizer::tokenize_source_line;
-use regex::Regex;
-
-lazy_static! {
-    static ref LABEL_REGEX: Regex = Regex::new(r"^[A-Za-z_0-9]+$").unwrap();
-}
 
 pub struct LangCommandParserContext {
     line: SourceLine,
@@ -43,23 +38,11 @@ pub struct SourceLine {
     pub arguments: Vec<LangLiteral>,
 }
 
-fn validate_label_name(string: &str) -> Result<&str, LangParseError> {
-    if string == "" {
-        Err(LangParseError::LabelNameExpected)
-    } else if !LABEL_REGEX.is_match(string) {
-        Err(LangParseError::InvalidLabelName)
-    } else if LangCommand::from_string(string).is_some() {
-        Err(LangParseError::InvalidLabelName)
-    } else {
-        Ok(string)
-    }
-}
-
 fn handle_expected_label(
     mut ctx: LangCommandParserContext,
     token_ctx: &LangCommandParserTokenContext,
 ) -> Result<LangCommandParserContext, LangParseError> {
-    ctx.line.label = Some(validate_label_name(token_ctx.at_token)?.to_string());
+    ctx.line.label = Some(LangLiteral::validate_symbol_name(token_ctx.at_token)?.to_string());
     ctx.last_token_was_label = true;
 
     Ok(ctx)
@@ -95,7 +78,6 @@ pub fn parse_command_line(line: &str) -> Result<SourceLine, LangParseError> {
     };
 
     for (ii, token) in tokens.iter().enumerate() {
-        println!("at token:'{}'", token);
         let token_ctx = LangCommandParserTokenContext {
             at_index: ii,
             at_token: token,
@@ -125,7 +107,7 @@ pub fn parse_command_line(line: &str) -> Result<SourceLine, LangParseError> {
                 && token == ","
             {
                 return Err(LangParseError::UnexpectedToken);
-            } else {
+            } else if !ctx.last_token_was_argument && token != "," {
                 let arg = LangLiteral::from_string(token)?;
                 ctx.line.arguments.push(arg);
                 to_set_was_arg = true;
@@ -141,8 +123,9 @@ pub fn parse_command_line(line: &str) -> Result<SourceLine, LangParseError> {
 
 #[cfg(test)]
 mod tests {
-    use crate::lang::LangCommand;
+    use crate::lang::{LangCommand, LangLiteral};
     use crate::parser::command_parser::parse_command_line;
+    use std::borrow::Borrow;
 
     #[test]
     fn label_parsed() {
@@ -167,5 +150,41 @@ mod tests {
             source_line.mnemonic.expect("Mnemonic is empty"),
             LangCommand::ADD
         );
+    }
+
+    #[test]
+    fn args_parsed() {
+        let source_line =
+            parse_command_line("ADD r0, 100, LD, 0xff, #0b101").expect("Line parsing failed");
+        assert_eq!(source_line.arguments.len(), 5);
+        if let LangLiteral::Register(reg) = source_line.arguments[0] {
+            assert_eq!(reg, 0);
+        } else {
+            assert!(false);
+        }
+
+        if let LangLiteral::Address(addr) = source_line.arguments[1] {
+            assert_eq!(addr, 100);
+        } else {
+            assert!(false);
+        }
+
+        if let LangLiteral::Symbol(symb) = source_line.arguments[2].borrow() {
+            assert_eq!(symb, "LD");
+        } else {
+            assert!(false);
+        }
+
+        if let LangLiteral::Address(addr) = source_line.arguments[3] {
+            assert_eq!(addr, 255);
+        } else {
+            assert!(false);
+        }
+
+        if let LangLiteral::Constant(addr) = source_line.arguments[4] {
+            assert_eq!(addr, 5);
+        } else {
+            assert!(false);
+        }
     }
 }

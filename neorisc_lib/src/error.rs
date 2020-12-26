@@ -4,8 +4,8 @@ use thiserror::Error;
 pub enum LangParseError {
     #[error("Duplicate label on line")]
     DuplicateLabel,
-    #[error("InvalidLabelName")]
-    InvalidLabelName,
+    #[error("InvalidSymbolName")]
+    InvalidSymbolName,
     #[error("LabelNameExpected")]
     LabelNameExpected,
     #[error("PossibleForgottenColon")]
@@ -33,5 +33,15 @@ pub enum LangParseError {
     #[error("UnexpectedToken")]
     UnexpectedToken,
     #[error("Other exception occured")]
+    Other,
+}
+
+#[derive(Error, Debug)]
+pub enum LangSyntaxError {
+    #[error("InstructionTakesZeroArguments")]
+    InstructionTakesZeroArguments,
+    #[error("UnexpectedArguments")]
+    UnexpectedArguments,
+    #[error("Other syntax error")]
     Other,
 }
